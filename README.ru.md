@@ -20,8 +20,9 @@ video-to-article/<video-id>/
 ├── 03-chunks/          куски до 2500 знаков, резанные по паузам, + манифест
 ├── 04-text/            каждый кусок переведён или вычищен (пять проходов)
 ├── 05-assembled.md     лид, структура H2/H3, цитаты, справки, заявки на иллюстрации
+├── coverage.md         соотношение объёмов по кускам: ничего не ушло в пересказ
 ├── 05-factcheck.md     отчёт PASS/FAIL по сверке с расшифровкой
-├── 06-edited.md        литературная редактура (+ журнал правок)
+├── 06-edited.md        литературная редактура (+ журнал, + 06-factcheck.md: правка не изменила фактов)
 ├── 07-proofread.md     корректура (+ журнал)
 ├── 08-headlines.md     пять вариантов заголовка
 ├── frames/             кандидаты по сменам сцен и готовые иллюстрации
@@ -38,13 +39,13 @@ video-to-article/<video-id>/
 | 2 | `transcribe.py --detect-only` | определить язык и спросить: язык статьи, число кадров, SEO |
 | 3 | `transcribe.py` | Whisper `large-v3` (faster-whisper, mlx-whisper или openai-whisper), детерминированное декодирование |
 | 4 | `va-context-builder` | спикеры, темы, глоссарий, ловушки распознавания, голос |
-| 5 | `chunk.py` + `va-chunk-writer` ×N | куски параллельно: буквально → по-русски → термины → живость → читка вслух |
+| 5 | `chunk.py` + `va-chunk-writer` ×N + `coverage.py` | куски параллельно: буквально → по-русски → термины → живость → читка вслух; слишком короткие переделываются |
 | 6 | `frames.py scenes` + `va-assembler` | структура, цитаты, справки, точки иллюстраций по сменам сцен |
-| 7 | `va-fact-checker` | **гейт**: никаких выдуманных фактов, имён, цифр и перевранных цитат |
-| 8 | `va-literary-editor` | живой, богатый литературный язык — не инфостиль |
+| 7 | `va-fact-checker` | **гейт**: ничего не выдумано и не потеряно, имена, цифры и цитаты верны (до трёх кругов, дальше решаете вы) |
+| 8 | `va-literary-editor` + `va-fact-checker` (сверка) | живой, богатый литературный язык — не инфостиль; затем проверка, что правка не изменила фактов |
 | 9 | `proofcheck.py` + `va-proofreader` | типографика, орфография, пунктуация, согласование, единообразие |
-| 10 | `va-headline-writer` | **гейт**: пять типов заголовков, выбираете вы |
-| 11 | `va-seo-optimizer` | ключевые слова по желанию (Ahrefs MCP, если подключён) |
+| 10 | `va-seo-optimizer` | ключевые слова по желанию (Ahrefs MCP, если подключён) |
+| 11 | `va-headline-writer` | **гейт**: пять типов заголовков, выбираете вы |
 | 12 | `frames.py extract` | полноразмерные кадры по выбранным таймкодам, без чёрных и смазанных |
 | 13 | `va-finalizer` | `article.md` с front matter, кадрами и ссылкой на источник |
 | 14 | `habr.py` | выгрузка для Хабра по желанию |
@@ -95,9 +96,19 @@ python3 $S/fetch.py "https://youtu.be/…" --workdir work
 python3 $S/transcribe.py work/<id> --model large-v3-turbo
 python3 $S/chunk.py work/<id>
 python3 $S/frames.py work/<id> scenes
+python3 $S/coverage.py work/<id> --mode translate --to ru
 python3 $S/proofcheck.py article.md --lang ru --fix --report findings.md
 python3 $S/habr.py article.md --cut
 ```
+
+## Тесты
+
+```bash
+python3 -m unittest discover -s tests
+```
+
+Тесты проверяют типографику (код, ссылки, HTML, спецблоки и технические токены вроде `x86-64` или
+`2026-10-09` не должны пострадать), выгрузку для Хабра, таймкоды, нарезку и контроль объёма.
 
 ## Лицензия
 

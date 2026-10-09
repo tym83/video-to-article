@@ -20,8 +20,9 @@ video-to-article/<video-id>/
 ├── 03-chunks/          ≤2500-character chunks cut at natural pauses + manifest
 ├── 04-text/            each chunk translated or cleaned up (five passes)
 ├── 05-assembled.md     lead, H2/H3 structure, quotes, notes, illustration requests
+├── coverage.md         length ratio per chunk: nothing summarised away
 ├── 05-factcheck.md     PASS/FAIL report against the transcript
-├── 06-edited.md        literary editing (+ edit log)
+├── 06-edited.md        literary editing (+ edit log, + 06-factcheck.md: the edit changed no facts)
 ├── 07-proofread.md     proofreading (+ log)
 ├── 08-headlines.md     five headline options
 ├── frames/             scene candidates and the extracted illustrations
@@ -38,13 +39,13 @@ video-to-article/<video-id>/
 | 2 | `transcribe.py --detect-only` | detect the language, then ask: output language, number of frames, SEO |
 | 3 | `transcribe.py` | Whisper `large-v3` (faster-whisper, mlx-whisper or openai-whisper), deterministic decoding |
 | 4 | `va-context-builder` | speakers, topics, glossary, recognition traps, voice |
-| 5 | `chunk.py` + `va-chunk-writer` ×N | chunks processed in parallel: literal → native → terms → liveness → read-aloud |
+| 5 | `chunk.py` + `va-chunk-writer` ×N + `coverage.py` | chunks processed in parallel: literal → native → terms → liveness → read-aloud; chunks that came out too short are redone |
 | 6 | `frames.py scenes` + `va-assembler` | structure, quotes, notes, illustration points from scene changes |
-| 7 | `va-fact-checker` | **gate**: no invented facts, names, numbers or distorted quotes |
-| 8 | `va-literary-editor` | living, rich literary language — not "infostyle" |
+| 7 | `va-fact-checker` | **gate**: nothing invented, nothing dropped, no wrong names, numbers or quotes (max 3 rounds, then the user decides) |
+| 8 | `va-literary-editor` + `va-fact-checker` (diff) | living, rich literary language — not "infostyle"; then a check that editing changed no facts |
 | 9 | `proofcheck.py` + `va-proofreader` | typography, spelling, punctuation, agreement, consistency |
-| 10 | `va-headline-writer` | **gate**: five headline types, the user picks one |
-| 11 | `va-seo-optimizer` | optional keywords (Ahrefs MCP if connected) |
+| 10 | `va-seo-optimizer` | optional keywords (Ahrefs MCP if connected) |
+| 11 | `va-headline-writer` | **gate**: five headline types, the user picks one |
 | 12 | `frames.py extract` | full-size frames at the chosen timestamps, skipping black or blurred ones |
 | 13 | `va-finalizer` | `article.md` with front matter, frames and the source credit |
 | 14 | `habr.py` | optional Habr export |
@@ -96,9 +97,19 @@ python3 $S/fetch.py "https://youtu.be/…" --workdir work
 python3 $S/transcribe.py work/<id> --model large-v3-turbo
 python3 $S/chunk.py work/<id>
 python3 $S/frames.py work/<id> scenes
+python3 $S/coverage.py work/<id> --mode translate --to ru
 python3 $S/proofcheck.py article.md --lang ru --fix --report findings.md
 python3 $S/habr.py article.md --cut
 ```
+
+## Tests
+
+```bash
+python3 -m unittest discover -s tests
+```
+
+The suite covers the typography rules (code, links, HTML, special blocks, technical tokens like `x86-64` or
+`2026-10-09` must survive), the Habr conversion, timestamps, chunking and coverage.
 
 ## License
 

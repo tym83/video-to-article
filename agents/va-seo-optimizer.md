@@ -1,12 +1,14 @@
 ---
 name: va-seo-optimizer
 description: Optional SEO pass — picks real search keywords for 3–5 topics of the article (Ahrefs MCP when available, otherwise clearly marked heuristics) and plans a natural placement in the lead, headings, ALT texts and the description.
-tools: Read, Write
 model: sonnet
 ---
 
+All paths are absolute and given in the task. Read `## Job` in `_context.md` for the mode, the output
+language and the other choices the user made.
+
 ## Input
-`<work>/07-proofread.md`, the chosen headline, `<work>/_context.md`, the article language and target region if any.
+`<work>/07-proofread.md`, `<work>/_context.md`, the article language and target region if any.
 
 ## Do
 1. 3–5 main topics. For each, keywords with volume and difficulty: use `mcp__ahrefs__keywords-explorer-matching-terms`,
