@@ -6,7 +6,9 @@ Give it a YouTube link (or anything `yt-dlp` can download) or a local video/audi
 speech with Whisper, asks whether to translate and into which language, processes the transcript chunk by
 chunk so nothing is summarised away, builds a structured article, fact-checks it against the transcript,
 edits it into living literary language, proofreads it, pulls frames from the video and places them in the
-text, offers five headlines, and can export the result in Habr's markdown flavour.
+text, offers five headlines, and delivers the result where it will live: a Habr-ready markdown file, a draft
+page on your own site styled in the site's colours and fonts (a draft pull request for git-hosted sites, a
+draft post for WordPress or Ghost), or plain markdown.
 
 Русская версия: [README.ru.md](README.ru.md).
 
@@ -49,7 +51,7 @@ video-to-article/<video-id>/
 | 11 | `va-headline-writer` | **gate**: five headline types, the user picks one |
 | 12 | `frames.py extract` | full-size frames at the chosen timestamps, skipping black or blurred ones |
 | 13 | `va-finalizer` | `article.md` with front matter, frames and the source credit |
-| 14 | `habr.py` | optional Habr export |
+| 14 | `blocks.py` + `habr.py` / `va-site-publisher` | delivery: Habr markdown (quotes natively or as image cards), or your own site — quotes, notes and number cards styled from the site (`sitestyle.py`), then a draft PR, a WordPress/Ghost draft or an upload bundle |
 
 The Russian editing and proofreading rules (`references/ru-editing.md`, `references/ru-proofreading.md`)
 are adapted from a Russian book-publishing toolchain and the Lopatin spelling reference: bureaucratese,
@@ -69,7 +71,7 @@ As a plugin from this repository:
 Or manually: copy `skills/video-to-article` to `~/.claude/skills/` and `agents/*.md` to `~/.claude/agents/`.
 
 System requirements: `ffmpeg`, Python 3.10+, and the Python packages `yt-dlp`, `faster-whisper` (or
-`mlx-whisper` on Apple Silicon, or `openai-whisper`) and `pillow`. The skill offers to install the Python
+`mlx-whisper` on Apple Silicon, or `openai-whisper`), `pillow` and `markdown`. The skill offers to install the Python
 part into `~/.venvs/video-to-article` when something is missing.
 
 ## Use
@@ -81,6 +83,20 @@ part into `~/.venvs/video-to-article` when something is missing.
 
 The skill asks three questions after detecting the language (output language, number of illustrations,
 SEO), stops at two gates (fact-check, headline) and offers a Habr export at the end.
+
+## Where it publishes
+
+Asked at the start, because it changes how quotes, notes and number callouts are made:
+
+- **Habr** — no callout blocks there, so quotes become native blockquotes (searchable), or, on request,
+  PNG cards (they must be uploaded and are not searchable). The title is plain text, sections start with `#`.
+- **Your own site** — give its URL: `sitestyle.py` takes the colours, fonts and corner radius, `blocks.py`
+  renders quotes, notes and factoids as HTML with a matching stylesheet (and cards if wanted). This needs a
+  site where you can add CSS. Delivery: a git-hosted site (Hugo, Jekyll, Astro, Docusaurus, MkDocs …) gets a
+  page that follows its existing posts, a local build and a **draft pull request**; WordPress and Ghost get a
+  **draft post** via their API (the key stays in a file you create, never in the chat); anything else gets a
+  zip bundle. Nothing is published or merged without you.
+- **Plain markdown** — `article.md` with `> KIND:` blocks any layout tool can map.
 
 ## Habr
 
@@ -101,6 +117,9 @@ python3 $S/frames.py work/<id> scenes
 python3 $S/coverage.py work/<id> --mode translate --to ru
 python3 $S/proofcheck.py article.md --lang ru --fix --report findings.md
 python3 $S/habr.py article.md --cut
+python3 $S/sitestyle.py https://example.com -o style.json
+python3 $S/blocks.py article.md html --style style.json
+python3 $S/publish_cms.py bundle article.site.md --css blocks.css
 ```
 
 ## Tests

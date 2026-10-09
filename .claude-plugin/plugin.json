@@ -1,6 +1,6 @@
 {
   "name": "video-to-article",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Turn a video (YouTube link or local file) into a finished illustrated article: Whisper transcription, optional translation, fact-check, literary editing, proofreading, frames, Habr export.",
   "author": {
     "name": "Timur Tukaev",
