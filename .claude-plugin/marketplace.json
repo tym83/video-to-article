@@ -1,0 +1,14 @@
+{
+  "name": "video-to-article",
+  "owner": {
+    "name": "Timur Tukaev",
+    "url": "https://github.com/tym83"
+  },
+  "plugins": [
+    {
+      "name": "video-to-article",
+      "source": "./",
+      "description": "Video → finished illustrated article with transcription, translation, fact-check, literary editing, proofreading and Habr export."
+    }
+  ]
+}
