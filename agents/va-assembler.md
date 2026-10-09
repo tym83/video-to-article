@@ -24,9 +24,10 @@ language and the other choices the user made.
    Do not delete content: structure is added on top of the full text.
 2. **Lead**: 2–4 sentences before the first heading — who, what, why it matters to the reader.
 3. **Structure**: 5–12 H2 per hour of video, H3 only to split long sections. Strong, specific headings.
-4. **Special blocks**: FACTOID for a striking number, PULLQUOTE for a sharp quotable line (1–2 sentences, with
-   attribution), NOTE for a short explanation the reader may need. Do not overdo it: at most one block of a
-   kind per section.
+4. **Special blocks**: FACTOID for a striking real number, PULLQUOTE for a sharp quotable line (1–2 sentences,
+   with attribution), NOTE for a short explanation the reader may need. Placement rules (`publishing.md`):
+   never next to an image — at least one paragraph between a block and an IMAGE; never two blocks in a row;
+   at most one block of a kind per section; not in the lead and not right after a heading.
 5. **Illustrations**: exactly the requested number of `> IMAGE:` blocks (plus `hero` near the top); none if the
    number is 0 or the input is audio-only. Pick
    timestamps from `candidates.json` near the matching `<!-- t=… -->` mark; prefer frames that show

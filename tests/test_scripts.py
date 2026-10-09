@@ -9,7 +9,9 @@ from pathlib import Path
 SCRIPTS = Path(__file__).resolve().parent.parent / "skills" / "video-to-article" / "scripts"
 sys.path.insert(0, str(SCRIPTS))
 
+import blocks  # noqa: E402
 import coverage  # noqa: E402
+import sitestyle  # noqa: E402
 import frames  # noqa: E402
 import proofcheck as pc  # noqa: E402
 import transcribe  # noqa: E402
@@ -167,6 +169,51 @@ class Small(unittest.TestCase):
             self.assertNotEqual(0, r.returncode)
             self.assertIn("empty", r.stderr)
             self.assertNotIn("Traceback", r.stderr)
+
+
+ART = ("---\ntitle: \"T\"\n---\nЛид.\n\n## Раздел\n\nТекст.\n\n> FACTOID:\n> NUMBER: 7\n> TEXT: спиц у штурвала\n\n"
+       "Ещё.\n\n> PULLQUOTE:\n> TEXT: «Под — это стручок!»\n> ATTRIBUTION: Андрей\n\n```\n> NOTE: not a block\n```\n")
+
+
+class Blocks(unittest.TestCase):
+    def test_parse_skips_code(self):
+        kinds = [b[2] for b in blocks.parse_blocks(ART)]
+        self.assertEqual(["FACTOID", "PULLQUOTE"], kinds)
+
+    def test_html_mode(self):
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "a.md"
+            p.write_text(ART, encoding="utf-8")
+            blocks.cmd_html(str(p), blocks.load_style(None), str(Path(d) / "a.site.md"), str(Path(d) / "b.css"))
+            out = (Path(d) / "a.site.md").read_text(encoding="utf-8")
+            self.assertIn('<aside class="va-factoid"><span class="va-number">7</span>спиц у штурвала</aside>', out)
+            self.assertIn("<figcaption>— Андрей</figcaption>", out)
+            self.assertIn("> NOTE: not a block", out)
+            self.assertIn(".va-note", (Path(d) / "b.css").read_text(encoding="utf-8"))
+
+    def test_cards_and_habr(self):
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "a.md"
+            p.write_text(ART, encoding="utf-8")
+            blocks.cmd_cards(str(p), blocks.load_style(None), Path(d) / "cards")
+            self.assertTrue((Path(d) / "cards" / "card-01-factoid.png").exists())
+            subprocess.run([sys.executable, str(SCRIPTS / "habr.py"), str(p), "--cards", str(Path(d) / "cards")],
+                           check=True, capture_output=True)
+            out = (Path(d) / "a.habr.md").read_text(encoding="utf-8")
+            self.assertIn("](cards/card-01-factoid.png)", out)
+            self.assertIn("](cards/card-02-pullquote.png)", out)
+            self.assertIn("> NOTE: not a block", out)
+
+
+class SiteStyle(unittest.TestCase):
+    def test_colour_normalisation(self):
+        self.assertEqual("#ffffff", sitestyle.norm_hex("#FFF"))
+        self.assertEqual("#0a141e", sitestyle.norm_hex("rgb(10, 20, 30)"))
+        self.assertIsNone(sitestyle.norm_hex("rgba(0,0,0,0.1)"))
+
+    def test_font_family(self):
+        self.assertEqual("Inter", sitestyle.first_family("'Inter', system-ui, sans-serif"))
+        self.assertIsNone(sitestyle.first_family("var(--font), sans-serif"))
 
 
 if __name__ == "__main__":
