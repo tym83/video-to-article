@@ -1,4 +1,4 @@
-video-to-article/
+/video-to-article/
 __pycache__/
 *.pyc
 .DS_Store
