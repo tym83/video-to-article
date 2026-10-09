@@ -14,8 +14,8 @@ language and the other choices the user made.
 ## Input (given in the task)
 - the chunk file `<work>/03-chunks/NN_HH-MM-SS_HH-MM-SS.txt` (lines start with `[HH:MM:SS]`);
 - `<work>/_context.md` — read it first;
-- the mode: `translate <from>→<to>` or `clean <lang>`;
-- the previous chunk's last lines and its last speaker — **context only, do not process them**.
+- the mode from `## Job` in `_context.md`: `translate <from>→<to>` or `clean <lang>`;
+- the previous chunk's path — read only its last lines and who spoke last; **context only, do not process it**.
 
 ## Five passes
 - **A. Literal.** Translate (or, in clean mode, transcribe into written form) the full meaning. Do not

@@ -25,6 +25,7 @@ video-to-article/<video-id>/
 ├── 06-edited.md        literary editing (+ edit log, + 06-factcheck.md: the edit changed no facts)
 ├── 07-proofread.md     proofreading (+ log)
 ├── 08-headlines.md     five headline options
+├── 09-seo.md           optional keyword plan
 ├── frames/             scene candidates and the extracted illustrations
 ├── article.md          the final article with front matter and frames in place
 └── article.habr.md     optional Habr export
@@ -37,10 +38,10 @@ video-to-article/<video-id>/
 | 0 | script | check `ffmpeg`, `yt-dlp`, a Whisper backend; install into a venv if missing |
 | 1 | `fetch.py` | download the video (or take the local file), extract audio, normalise metadata |
 | 2 | `transcribe.py --detect-only` | detect the language, then ask: output language, number of frames, SEO |
-| 3 | `transcribe.py` | Whisper `large-v3` (faster-whisper, mlx-whisper or openai-whisper), deterministic decoding |
+| 3 | `transcribe.py` + `frames.py scenes` | Whisper `large-v3` (faster-whisper, mlx-whisper or openai-whisper), deterministic decoding |
 | 4 | `va-context-builder` | speakers, topics, glossary, recognition traps, voice |
 | 5 | `chunk.py` + `va-chunk-writer` ×N + `coverage.py` | chunks processed in parallel: literal → native → terms → liveness → read-aloud; chunks that came out too short are redone |
-| 6 | `frames.py scenes` + `va-assembler` | structure, quotes, notes, illustration points from scene changes |
+| 6 | `va-assembler` | structure, quotes, notes, illustration points from scene changes |
 | 7 | `va-fact-checker` | **gate**: nothing invented, nothing dropped, no wrong names, numbers or quotes (max 3 rounds, then the user decides) |
 | 8 | `va-literary-editor` + `va-fact-checker` (diff) | living, rich literary language — not "infostyle"; then a check that editing changed no facts |
 | 9 | `proofcheck.py` + `va-proofreader` | typography, spelling, punctuation, agreement, consistency |

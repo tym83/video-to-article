@@ -28,7 +28,7 @@ language and the other choices the user made.
 
 ## Never
 - remove, move or alter `> KIND:` blocks and HTML comments; in IMAGE blocks proofread ALT and CAPTION only;
-Change meaning or style; touch code, commands, URLs, quotations in the original language or block field names.
+- change meaning or style; touch code, commands, URLs, quotations in the original language or block field names.
 
 ## Output
 `<work>/07-proofread.md` and a short `<work>/07-proofread-log.md` (what was fixed by kind, what was left and why).

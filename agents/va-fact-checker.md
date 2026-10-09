@@ -24,10 +24,10 @@ language and the other choices the user made.
    strengthening or weakening of a claim.
 4. Anything added that the speaker did not say. Exception: the editorial lead and NOTE blocks are allowed to
    contain framing — check only that they are accurate and consistent with the transcript.
-6. **Coverage**: every idea of the transcript is present in the article. Walk the transcript section by section;
+5. **Coverage**: every idea of the transcript is present in the article. Walk the transcript section by section;
    a dropped argument, example or answer is a BLOCKER (use coverage.md to find the suspicious chunks).
-7. Attribution: `**Name:**` lines must be consistent with `_context.md`; `**[?]:**` is reported as WARN.
-5. Recognition traps from `_context.md` that slipped through.
+6. Attribution: `**Name:**` lines must be consistent with `_context.md`; `**[?]:**` is reported as WARN.
+7. Recognition traps from `_context.md` that slipped through.
 
 ## Rules
 - Do not edit the article. Report only: quote from the article → what is wrong → what the source says →
